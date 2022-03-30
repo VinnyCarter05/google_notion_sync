@@ -47,6 +47,13 @@ class Calendar:
         else:
             self.all_notion_page_ids = []
             self.all_events = []
+
+    def __repr__(self) -> str:
+        all_events_list = f"Calendar with {len(self.all_events)} events: \n"
+        for num, event in enumerate(self.all_events):
+            if (num <= 10) or (num == len(self.all_events) - 1):
+                all_events_list += f"{num}: {event}  \n"
+        return all_events_list
         
     def allProperties(self):
         propertyList = []
@@ -67,9 +74,9 @@ class Calendar:
         has_more = True
         payload = {"page_size": 100}
         while has_more:
-            print (payload)
+            logger.info (f"payload = {payload}")
             r = notion_query_database(databaseId, headers=self.headers, payload=payload)
-            print (r.json()['has_more'], r.json()['next_cursor'])
+            logger.info (f"r.json()['has_more'] = {r.json()['has_more']}, r.json()['next_cursor'] = {r.json()['next_cursor']}")
             if r != None:
                 results = r.json()['results']
                 has_more = r.json()['has_more']

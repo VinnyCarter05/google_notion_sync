@@ -27,6 +27,7 @@ def run():
     drive_service = get_google_drive_service(creds)
     notion_calendar = Calendar(notion_database_id=NOTION_DATABASE, googleCalendarId="", NOTION_API_KEY=NOTION_API_KEY, calendarService=calendar_service, driveService=drive_service
         , googleDriveFileId=GOOGLE_DRIVE_FILE_ID, loadFrom = "notion", resync=True,timeMinDays=1,timeMaxDays=10)
+    print (notion_calendar)
     for event in notion_calendar.all_events:
         logger.warning(f"event = {event.properties}")
     with open ("./google_notion_sync/data/notion_calendar.pickle","wb") as f:

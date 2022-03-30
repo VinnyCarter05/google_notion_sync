@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelnam
 logger = logging.getLogger(__name__)
 
 class Event:
-    def __init__ (self, googleId="", googleCreated="", googleUpdated="", googleStatus="",
+    def __init__ (self, google_event = None, googleId="", googleCreated="", googleUpdated="", googleStatus="",
                   notionId="", notionCreated="", notionUpdated="", 
                   summary="", calendar="", description="", location="", 
                   start="", end="", allDay=False, timeZone="", recurrence="",NOTION_API_KEY=""):
@@ -38,6 +38,11 @@ class Event:
         self.headers = {"Authorization": f"Bearer {self.NOTION_API_KEY}",
                         "Content-Type": "application/json",
                         "Notion-Version": "2021-08-16"}
+        if google_event != None: # if google_event is provided, initialize values
+            self.from_google_event(google_event)
+
+    def __repr__(self) -> str:
+        return f"Event (googleId: {self.properties['googleId']}  summary: {self.properties['summary']}  start: {self.properties['start']}  recurrence: {self.properties['recurrence']}"
 
     def from_google_event(self, google_event):
                 #, googleCalendar=None):
