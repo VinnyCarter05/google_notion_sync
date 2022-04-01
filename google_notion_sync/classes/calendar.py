@@ -54,6 +54,9 @@ class Calendar:
             if (num <= 10) or (num == len(self.all_events) - 1):
                 all_events_list += f"{num}: {event}  \n"
         return all_events_list
+
+    def __len__(self) -> int:
+        return len (self.all_events)
         
     def allProperties(self):
         propertyList = []
@@ -99,11 +102,16 @@ class Calendar:
     def get_notion_event (self, eventId):
         r = notion_retrieve_page(self.headers,eventId)
         if r != None:
-            notion_event = Event()
-            notion_event.from_notion_page(r.json())
+            notion_event = Event(notion_page=r.json())
+            # notion_event.from_notion_page(r.json())
             return notion_event
         else:
             return None
+
+    def delete_event(self, event, del_all_instances = False):
+        for num in range(len(self.all_events)):
+            
+            
 
     def getNotionEventFromGoogleId(self, databaseId, googleId):
         url = f'https://api.notion.com/v1/databases/{databaseId}/query'

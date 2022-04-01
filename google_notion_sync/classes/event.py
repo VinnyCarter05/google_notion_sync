@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelnam
 logger = logging.getLogger(__name__)
 
 class Event:
-    def __init__ (self, google_event = None, googleId="", googleCreated="", googleUpdated="", googleStatus="",
+    def __init__ (self, google_event = None, notion_page = None, googleId="", googleCreated="", googleUpdated="", googleStatus="",
                   notionId="", notionCreated="", notionUpdated="", 
                   summary="", calendar="", description="", location="", 
                   start="", end="", allDay=False, timeZone="", recurrence="",NOTION_API_KEY=""):
@@ -40,9 +40,35 @@ class Event:
                         "Notion-Version": "2021-08-16"}
         if google_event != None: # if google_event is provided, initialize values
             self.from_google_event(google_event)
+        if notion_page != None:
+            self.from_notion_page(notion_page)
 
     def __repr__(self) -> str:
-        return f"Event (googleId: {self.properties['googleId']}  summary: {self.properties['summary']}  start: {self.properties['start']}  recurrence: {self.properties['recurrence']}"
+        return f"Event (googleId: {self.properties['googleId']}  summary: {self.properties['summary']}  status: {self.properties['googleStatus']} start: {self.properties['start']}  recurrence: {self.properties['recurrence']}"
+
+    def __eq__(self, __o: object) -> bool:
+        return self.properties['googleId']== __o.properties['googleId']
+
+    def __ne__(self, __o: object) -> bool:
+        return self.properties['googleId'][:26]!= __o.properties['googleId'][:26]
+
+    def __gt__(self, __o: object) -> bool:
+        # returns true if self is an instance of __o
+        return (self.properties['googleId'][:26]== __o.properties['googleId'][:26] and len(self.properties['googleId'])>len(__o.properties['googleId']))
+
+    def __ge__(self, __o: object) -> bool:
+        # returns true if self is an instance of __o or is the same googleId
+        return (self.properties['googleId'][:26]== __o.properties['googleId'][:26] and len(self.properties['googleId'])>=len(__o.properties['googleId'])) 
+
+    def __lt__(self, __o: object) -> bool:
+        # returns true if __o is an instance of self
+        return (self.properties['googleId'][:26]== __o.properties['googleId'][:26] and len(self.properties['googleId'])<len(__o.properties['googleId']))
+
+    def __le__(self, __o: object) -> bool:
+        # returns true if __o is an instance of self
+        return (self.properties['googleId'][:26]== __o.properties['googleId'][:26] and len(self.properties['googleId'])<=len(__o.properties['googleId']))
+
+
 
     def from_google_event(self, google_event):
                 #, googleCalendar=None):
