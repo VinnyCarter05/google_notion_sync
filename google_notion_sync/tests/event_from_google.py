@@ -34,10 +34,9 @@ def run():
     with open ("./google_notion_sync/data/11.pickle","wb") as f:
         pickle.dump(google_events,f)
     for event in google_events:
-        ev = Event()
-        ev.from_google_event(event)
+        ev = Event(google_event=event)
         logger.warning(f"event = {event}")
-        logger.warning(f"ev = {ev.properties}")
+        logger.warning(f"ev = {ev}")
         
 
 if __name__ == "__main__":
