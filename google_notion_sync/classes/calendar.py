@@ -109,9 +109,13 @@ class Calendar:
             return None
 
     def delete_event(self, event, del_all_instances = False):
-        for num in range(len(self.all_events)):
-            
-            
+        keep_events = []
+        for one_event in self.all_events:
+            if event <= one_event:
+                pass
+            else:
+                keep_events.append(one_event)
+        self.all_events = keep_events
 
     def getNotionEventFromGoogleId(self, databaseId, googleId):
         url = f'https://api.notion.com/v1/databases/{databaseId}/query'
