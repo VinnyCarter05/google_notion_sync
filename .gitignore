@@ -5702,3 +5702,9 @@ venv/lib/python3.8/site-packages/setuptools-49.2.1.dist-info/zip-safe
 .venv/lib/python3.9/site-packages/python_dateutil-2.8.2.dist-info/zip-safe
 .env
 .DS_Store
+google_notion_sync/classes/__pycache__/calendar.cpython-39.pyc
+google_notion_sync/classes/__pycache__/event.cpython-39.pyc
+google_notion_sync/config/synctoken.json
+google_notion_sync/config/token.json
+google_notion_sync/google_api/__pycache__/calendar.cpython-39.pyc
+google_notion_sync/notion_api/__pycache__/database.cpython-39.pyc
