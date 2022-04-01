@@ -8,7 +8,7 @@ import pickle
 from dotenv import load_dotenv
 
 from google_notion_sync.google_api.credentials import get_google_creds
-from google_notion_sync.google_api.calendar import get_all_google_calendars, get_google_calendar_service, google_calendar_sync_events_list 
+from google_notion_sync.google_api.calendar import get_all_google_calendars, get_google_calendar_service, get_google_instances, google_calendar_sync_events_list 
 from google_notion_sync.google_api.drive import get_google_drive_service
 from google_notion_sync.classes.calendar import Calendar
 from google_notion_sync.classes.event import Event
@@ -29,9 +29,18 @@ def run():
     logger.info(all_google_calendars)
     all_google_events = []
     google_events = google_calendar_sync_events_list(calendar_service,drive_service,google_drive_fileId=GOOGLE_DRIVE_FILE_ID,
-        calendar_id=all_google_calendars[0]['id'],resync=True,timeMinDays=1,timeMaxDays=10)
+        calendar_id=all_google_calendars[0]['id'],resync=False)#,timeMinDays=10,timeMaxDays=30)
     logger.info(f"google_events:{google_events}")
-    with open ("./google_notion_sync/data/11.pickle","wb") as f:
+    # google_instances = []
+    # for num, google_trial_event in enumerate(google_events):
+    #     logger.warning (f"{num}, {google_trial_event}")
+    #     try:
+    #         google_instance, nextSyncToken = get_google_instances(calendar_service,google_trial_event['calendar'], google_trial_event['id'])
+    #         google_instances.extend(google_instance)
+    #         logger.warning (f"{num} non-recurring: {google_instances[-1]}")
+    #     except:
+    #         logger.warning (f"{num} error non-recurring: {google_trial_event}")
+    with open ("./google_notion_sync/data/12.pickle","wb") as f:
         pickle.dump(google_events,f)
     for event in google_events:
         ev = Event(google_event=event)

@@ -35,6 +35,8 @@ with open ("./google_notion_sync/data/9.pickle","rb") as f:
     google_trial_events_9 = pickle.load(f)
 with open ("./google_notion_sync/data/10.pickle","rb") as f:
     google_trial_events_10 = pickle.load(f)
+with open ("./google_notion_sync/data/11.pickle","rb") as f:
+    google_trial_events_11 = pickle.load(f)
 with open ("./google_notion_sync/data/google_trial_events.pickle","rb") as f:
     google_trial_events = pickle.load(f)
 
@@ -48,10 +50,12 @@ print ("7:", google_trial_events_7)
 print ("8:", google_trial_events_8)
 print ("9:", google_trial_events_9)
 print ("10:", google_trial_events_10)
+print ("11:", google_trial_events_11)
 # print ("google_trial_events:", google_trial_events)
 
 combined_google_trial_events = google_trial_events_1+google_trial_events_2+google_trial_events_3 + google_trial_events_4 + google_trial_events_5+google_trial_events_6+google_trial_events_7+google_trial_events_8+google_trial_events_9
 
+# print (all_google_events)
 # for event in combined_google_trial_events:
 #     print (event['status'], event['id'], event.keys())
 
