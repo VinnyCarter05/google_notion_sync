@@ -12,5 +12,14 @@ google_notion_sync/google_api/calendar.py
 google_notion_sync/google_api/credentials.py
 google_notion_sync/google_api/drive.py
 google_notion_sync/notion_api/__init__.py
+google_notion_sync/notion_api/database.py
 google_notion_sync/tests/__init__.py
+google_notion_sync/tests/event_from_google.py
+google_notion_sync/tests/google_load_json.py
 google_notion_sync/tests/loading_test.py
+google_notion_sync/tests/notion_json_test.py
+google_notion_sync/tests/pickle_load.py
+google_notion_sync/tests/process_google_events.py
+google_notion_sync/tests/try.py
+google_notion_sync/utils/__init__.py
+google_notion_sync/utils/helpers.py

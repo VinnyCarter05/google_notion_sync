@@ -7,7 +7,7 @@ google-api-python-client==2.40.0
 google-auth==2.6.0
 google-auth-httplib2==0.1.0
 google-auth-oauthlib==0.5.0
--e git+https://github.com/VinnyCarter05/google_notion_sync.git@9ed7fb576f849b1faa45b002aa87600eec3b351f#egg=google_notion_sync
+#-e git+https://github.com/VinnyCarter05/google_notion_sync.git@9ed7fb576f849b1faa45b002aa87600eec3b351f#egg=google_notion_sync
 googleapis-common-protos==1.55.0
 httplib2==0.20.4
 idna==3.3
