@@ -14,10 +14,11 @@ from google_notion_sync.classes.calendar import Calendar
 from google_notion_sync.classes.event import Event
 from google_notion_sync.utils.helpers import as_list
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s',filename='./google_notion_sync/logs/example.log', filemode='w')
-logger = logging.getLogger(__name__)
+# logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s',filename='./google_notion_sync/logs/example.log', filemode='w')
+# logger = logging.getLogger(__name__)
 
-def run():
+def new_raw_events(pickle_file_name="example.pickle"):
+    pickle_file_path = os.path.join("./google_notion_sync/data", pickle_file_name)
     logger.info("NEW EXECUTION")
     load_dotenv()
     GOOGLE_DRIVE_FILE_ID = os.getenv('GOOGLE_DRIVE_FILE_ID')
@@ -40,7 +41,7 @@ def run():
     #         logger.warning (f"{num} non-recurring: {google_instances[-1]}")
     #     except:
     #         logger.warning (f"{num} error non-recurring: {google_trial_event}")
-    with open ("./google_notion_sync/data/12.pickle","wb") as f:
+    with open (pickle_file_path,"wb") as f:
         pickle.dump(google_events,f)
     for event in google_events:#google_instances:
         ev = Event()
@@ -50,4 +51,9 @@ def run():
     # logger.warning(f"nextSyncToken = {nextSyncToken}")
 
 if __name__ == "__main__":
-    run()
+    file_name = "abc"
+    log_file_path = os.path.join("./logs", file_name+".log")
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s',filename=log_file_path, filemode='w')
+    logger = logging.getLogger(__name__)
+    pickle_file_name = file_name+".pickle"
+    new_raw_events(pickle_file_name)

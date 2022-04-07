@@ -9,7 +9,7 @@ from googleapiclient.http import MediaFileUpload #, MediaIoBaseDownload
 from google_notion_sync.google_api.drive import google_drive_download_file, replaceFileGoogleDrive
 from google_notion_sync.utils.helpers import datetime_from_now
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s',filename='./logs/example.log', filemode='w')
+# logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s',filename='./logs/example.log', filemode='w')
 logger = logging.getLogger(__name__)
 
 def get_google_calendar_service(creds):
@@ -55,11 +55,16 @@ def get_all_google_calendars (service):
         all_google_calendars.append (calendar_item)
     return all_google_calendars
 
-def google_calendar_events_list(calendar_service, calendar_id, page_token = None, sync_token = None):#, timeMax = None, timeMin = None):
+def google_calendar_events_list(calendar_service, calendar_id, page_token = None, single_events = False, sync_token = None, timeMax = None, timeMin = None):
     events = None
     error_ = 0
     try:
-        events = calendar_service.events().list(calendarId=calendar_id,pageToken=page_token,syncToken=sync_token).execute()
+        if sync_token != None:
+            events = calendar_service.events().list(calendarId=calendar_id,pageToken=page_token,singleEvents = single_events, syncToken=sync_token).execute()
+        elif timeMin != None and timeMax != None:
+            events = calendar_service.events().list(calendarId=calendar_id,pageToken=page_token,singleEvents = single_events, timeMin=timeMin, timeMax=timeMax).execute()
+        else:
+            events = calendar_service.events().list(calendarId=calendar_id,pageToken=page_token,singleEvents = single_events).execute() 
         return events, error_
     except HttpError as error:
     #           // A 410 status code, "Gone", indicates that the sync token is invalid.
@@ -70,12 +75,18 @@ def google_calendar_events_list(calendar_service, calendar_id, page_token = None
             logger.error ('error:', error)
             return None, error.status_code
     except:
-        logger.error ('error:', error)
+        logger.error ('error:', error_)
         return None, error.status_code
     
-def google_calendar_sync_events_list(service, drive_service, google_drive_fileId="", calendar_id='primary',resync=False):#,timeMinDays=1,timeMaxDays=1):
-    # timeMin = datetime_from_now(-timeMinDays)
-    # timeMax = datetime_from_now(timeMaxDays)
+def google_calendar_sync_events_list(service, drive_service, google_drive_fileId="", calendar_id='primary',resync=False,timeMinDays=None,timeMaxDays=None):
+    if timeMinDays != None:
+        timeMin = datetime_from_now(-timeMinDays)
+    else:
+        timeMin = None
+    if timeMaxDays != None:
+        timeMax = datetime_from_now(timeMaxDays)
+    else:
+        timeMax = None
     all_events = []
     #     // Load the sync token stored from the last execution, if any.
     logger.warning("google_calendar_sync_events_list")
@@ -109,7 +120,7 @@ def google_calendar_sync_events_list(service, drive_service, google_drive_fileId
     events = None
     while not last_page:
         logger.info(f"google_calendar_events_list call with parameters: page_token = {page_token}, sync_token = {sync_token}")
-        events, error_ = google_calendar_events_list(service, calendar_id, page_token = page_token, sync_token = sync_token)#, timeMax = timeMax, timeMin = timeMin)
+        events, error_ = google_calendar_events_list(service, calendar_id, page_token = page_token, single_events = True, sync_token = sync_token, timeMax = timeMax, timeMin = timeMin)
     #           // A 410 status code, "Gone", indicates that the sync token is invalid.
         if error_ == 410:
             logger.warning ("Invalid sync token, clearing event store and re-syncing")
@@ -129,7 +140,7 @@ def google_calendar_sync_events_list(service, drive_service, google_drive_fileId
             fiahl = drive_service.files().create(body=body, media_body=media).execute()
             os.remove(st_file_name) #? need to remove
             sync_token = None
-            all_events = google_calendar_sync_events_list(service,drive_service, google_drive_fileId=google_drive_fileId, calendarId=calendar_id,resync=resync)#,timeMinDays=timeMinDays,timeMaxDays=timeMaxDays)
+            all_events = google_calendar_sync_events_list(service,drive_service, google_drive_fileId=google_drive_fileId, calendarId=calendar_id,resync=resync,timeMinDays=timeMinDays,timeMaxDays=timeMaxDays)
             return all_events
         elif error_ > 0:
             logger.error ('error:', error_)
@@ -151,19 +162,20 @@ def google_calendar_sync_events_list(service, drive_service, google_drive_fileId
         if page_token == None:
             last_page = True
 
-    google_instances = []
-    for num, google_trial_event in enumerate(all_events):
-        logger.warning (f"{num}, googe_trial_event = {google_trial_event}")
-        google_instances.append(google_trial_event)
-        if google_trial_event['status'] == 'cancelled':
-            logger.warning (f"{num} cancelled so google_trial_event = {google_trial_event}")
-        else:
-            try:
-                google_instance, nextSyncToken = get_google_instances(service,google_trial_event['calendar'], google_trial_event['id'])
-                google_instances.extend(google_instance)
-                logger.warning (f"{num} instances recurring: {google_instance}")
-            except:
-                logger.warning (f"{num} error non-recurring: {google_trial_event}")
+    google_instances = all_events
+    # google_instances = []
+    # for num, google_trial_event in enumerate(all_events):
+    #     logger.warning (f"{num}, googe_trial_event = {google_trial_event}")
+    #     google_instances.append(google_trial_event)
+    #     if google_trial_event['status'] == 'cancelled':
+    #         logger.warning (f"{num} cancelled so google_trial_event = {google_trial_event}")
+    #     else:
+    #         try:
+    #             google_instance, nextSyncToken = get_google_instances(service,google_trial_event['calendar'], google_trial_event['id'])
+    #             google_instances.extend(google_instance)
+    #             logger.warning (f"{num} instances recurring: {google_instance}")
+    #         except:
+    #             logger.warning (f"{num} error non-recurring: {google_trial_event}")
     #     // Store the sync token from the last request to be used during the next execution.
     if events['nextSyncToken']!= None:
         sync_token = events['nextSyncToken']

@@ -10,7 +10,7 @@ from google_notion_sync.utils.helpers import datetime_from_now
 # import event
 # import calendar_kit as ck
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s',filename='./logs/example.log', filemode='w')
+# logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s',filename='./logs/example.log', filemode='w')
 logger = logging.getLogger(__name__)
 
 class Calendar:
@@ -30,6 +30,7 @@ class Calendar:
         self.timeMaxDays=timeMaxDays
         self.date_min = datetime_from_now(-timeMinDays)
         self.date_max = datetime_from_now(timeMaxDays)
+        self.all_events = []
 
         if loadFrom == 'notion':
             self.load_from_notion()           
@@ -109,8 +110,16 @@ class Calendar:
             return None
 
     def delete_event(self, event, del_all_instances = False):
-        for num in range(len(self.all_events)):
-            
+        keep_events = []
+        if del_all_instances:
+            for one_event in self.all_events:
+                if not (event <= one_event):
+                    keep_events.append(one_event)
+        else:
+            for one_event in self.all_events:
+                if not(event == one_event):
+                    keep_events.append(one_event)
+        self.all_events = keep_events    
             
 
     def getNotionEventFromGoogleId(self, databaseId, googleId):
@@ -216,3 +225,8 @@ class Calendar:
                                            
     def addEvent(self, event):
         self.all_events.append(event)
+
+    def from_google_calendar_events (self, google_calendar_events):
+        for event in google_calendar_events:  # google_instances:
+            ev = Event(google_event=event)
+            self.all_events.append(ev)

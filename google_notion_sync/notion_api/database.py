@@ -3,7 +3,7 @@
 import logging
 import requests
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s',filename='./logs/example.log', filemode='w')
+# logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s',filename='./logs/example.log', filemode='w')
 logger = logging.getLogger(__name__)
 
 def notion_query_database (database_id, headers="", payload=""):

@@ -31,7 +31,7 @@ def run():
     all_google_events = []
     for i in range(len(all_google_calendars)):
         google_events = google_calendar_sync_events_list(calendar_service,drive_service,google_drive_fileId=GOOGLE_DRIVE_FILE_ID,
-            calendar_id=all_google_calendars[i]['id'],resync=True,timeMinDays=1,timeMaxDays=10)
+            calendar_id=all_google_calendars[i]['id'],resync=True, timeMinDays=None, timeMaxDays=None)
         logger.info (f"google_events = {google_events}")
         all_google_events.extend(as_list(google_events))
     logger.debug(f"all_google_events = {all_google_events}")
