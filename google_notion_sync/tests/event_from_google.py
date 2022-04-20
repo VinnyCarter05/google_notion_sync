@@ -12,7 +12,7 @@ from google_notion_sync.google_api.calendar import get_all_google_calendars, get
 from google_notion_sync.google_api.drive import get_google_drive_service
 from google_notion_sync.classes.calendar import Calendar
 from google_notion_sync.classes.event import Event
-from google_notion_sync.utils.helpers import as_list
+from google_notion_sync.utils.helpers import as_list, pickle_save
 
 # logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s',filename='./google_notion_sync/logs/example.log', filemode='w')
 # logger = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ def new_raw_events(pickle_file_name="example.pickle"):
     logger.info(all_google_calendars)
     all_google_events = []
     google_events = google_calendar_sync_events_list(calendar_service,drive_service,google_drive_fileId=GOOGLE_DRIVE_FILE_ID,
-        calendar_id=all_google_calendars[0]['id'],resync=False)#,timeMinDays=10,timeMaxDays=30)
+        calendar_id=all_google_calendars[-1]['id'],resync=False)#,timeMinDays=10,timeMaxDays=30)
     logger.info(f"google_events:{google_events}")
     # google_instances = []
     # for num, google_trial_event in enumerate(google_events):
@@ -41,17 +41,18 @@ def new_raw_events(pickle_file_name="example.pickle"):
     #         logger.warning (f"{num} non-recurring: {google_instances[-1]}")
     #     except:
     #         logger.warning (f"{num} error non-recurring: {google_trial_event}")
-    with open (pickle_file_path,"wb") as f:
-        pickle.dump(google_events,f)
+    pickle_save(google_events,pickle_file_path)
+    # with open (pickle_file_path,"wb") as f:
+    #     pickle.dump(google_events,f)
     for event in google_events:#google_instances:
-        ev = Event()
-        ev.from_google_event(event)
+        ev = Event(google_event=event)
+        # ev.from_google_event(event)
         logger.warning(f"event = {event}")
         logger.warning(f"ev = {ev.properties}")
     # logger.warning(f"nextSyncToken = {nextSyncToken}")
 
 if __name__ == "__main__":
-    file_name = "abc"
+    file_name = "13lots_of_changes"
     log_file_path = os.path.join("./logs", file_name+".log")
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s',filename=log_file_path, filemode='w')
     logger = logging.getLogger(__name__)

@@ -1,5 +1,5 @@
-import requests
-from dotenv import load_dotenv
+# import requests
+# from dotenv import load_dotenv
 # from decouple import config
 import datetime
 # import calendar_kit as ck
@@ -12,49 +12,53 @@ from google_notion_sync.google_api.calendar import get_google_instances
 logger = logging.getLogger(__name__)
 
 class Event:
-    def __init__ (self, google_event = None, notion_page = None, googleId="", googleCreated="", googleUpdated="", googleStatus="",
-                  notionId="", notionCreated="", notionUpdated="", 
-                  summary="", calendar="", description="", location="", 
-                  start="", end="", allDay=False, timeZone="", recurrence="",NOTION_API_KEY=""):
-        self.properties = {'googleId':googleId,
-                           'googleCreated':googleCreated,
-                           'googleUpdated':googleUpdated,
-                           'googleStatus':googleStatus,
-                           'notionId':notionId,
-                           'notionCreated':notionCreated,
-                           'notionUpdated':notionUpdated,
-                           'summary':summary,
-                           'calendar':calendar,
-                           'description':description,
-                           'location':location,
-                           'start':start,
-                           'end':end,
-                           'allDay':allDay,
-                           'timeZone':timeZone,
-                           'recurrence':recurrence
+    def __init__ (self, google_event = None, notion_page = None):#, googleId="", googleCreated="", googleUpdated="", googleStatus="",
+                #   notionId="", notionCreated="", notionUpdated="", 
+                #   summary="", calendar="", description="", location="", 
+                #   start="", end="", allDay=False, timeZone="", recurrence="",NOTION_API_KEY="", all_google_calendars=[]):
+        self.properties = {'googleId':"",#googleId,
+                           'googleCreated':"",#googleCreated,
+                           'googleUpdated':"",#googleUpdated,
+                           'googleStatus':"",#googleStatus,
+                           'googleCalendar':"",
+                           'notionId':"",#notionId,
+                           'notionCreated':"",#notionCreated,
+                           'notionUpdated':"",#notionUpdated,
+                           'summary':"",#summary,
+                           'calendar':"",#calendar,
+                           'description':"",#description,
+                           'location':"",#location,
+                           'start':"",#start,
+                           'end':"",#end,
+                           'allDay':"",#allDay,
+                           'timeZone':"",#timeZone,
+                           'recurrence':""#recurrence
                           }
-        load_dotenv() 
-        self.NOTION_API_KEY = NOTION_API_KEY
-        self.headers = {"Authorization": f"Bearer {self.NOTION_API_KEY}",
-                        "Content-Type": "application/json",
-                        "Notion-Version": "2021-08-16"}
+        # self.all_google_calendars = all_google_calendars
+        # load_dotenv() 
+        # self.NOTION_API_KEY = NOTION_API_KEY
+        # self.headers = {"Authorization": f"Bearer {self.NOTION_API_KEY}",
+        #                 "Content-Type": "application/json",
+        #                 "Notion-Version": "2021-08-16"}
         if google_event != None: # if google_event is provided, initialize values
             self.from_google_event(google_event)
         if notion_page != None:
             self.from_notion_page(notion_page)
 
     def __repr__(self) -> str:
-        return f"Event (googleId: {self.properties['googleId']}  summary: {self.properties['summary']}  status: {self.properties['googleStatus']} start: {self.properties['start']}  recurrence: {self.properties['recurrence']}"
+        return f"Event (googleId: {self.properties['googleId']}  summary: {self.properties['summary']}  status: {self.properties['googleStatus']} start: {self.properties['start']} calendar: {self.properties['calendar']} gooCal: {self.properties['googleCalendar']})"
 
     def __eq__(self, __o: object) -> bool:
         return self.properties['googleId']== __o.properties['googleId']
 
     def __ne__(self, __o: object) -> bool:
+        if __o == None:
+            return True
         return self.properties['googleId'][:26]!= __o.properties['googleId'][:26]
 
     def __gt__(self, __o: object) -> bool:
         # returns true if self is an instance of __o
-        return (self.properties['googleId'][:26]== __o.properties['googleId'][:26] and len(self.properties['googleId'])>len(__o.properties['googleId']))
+        return self.properties['googleId']>__o.properties['googleId']
 
     def __ge__(self, __o: object) -> bool:
         # returns true if self is an instance of __o or is the same googleId
@@ -62,21 +66,25 @@ class Event:
 
     def __lt__(self, __o: object) -> bool:
         # returns true if __o is an instance of self
-        return (self.properties['googleId'][:26]== __o.properties['googleId'][:26] and len(self.properties['googleId'])<len(__o.properties['googleId']))
+        return self.properties['googleId']< __o.properties['googleId']
 
     def __le__(self, __o: object) -> bool:
         # returns true if __o is an instance of self
         return (self.properties['googleId'][:26]== __o.properties['googleId'][:26] and len(self.properties['googleId'])<=len(__o.properties['googleId']))
 
 
-
     def from_google_event(self, google_event):
                 #, googleCalendar=None):
         try:
-            self.properties['calendar']=google_event['calendar']
+            self.properties['googleCalendar']=google_event['calendar']
+            # if self.all_google_calendars != []:
+                # self.properties['calendar'] = [i for i in self.all_google_calendars if i['id']==google_event['calendar']][0]['summary']
+            # else:
+                # self.properties['calendar'] = ""
         except:
-            self.properties['calendar']=""
-            logger.warning(f"google_event no 'calendar'")
+            self.properties['googleCalendar'] = ""
+            # self.properties['calendar'] = ""
+            logger.warning(f"google_event no 'googleCalendar'")
         try:
             self.properties['googleId'] = google_event['id']
         except:
@@ -169,7 +177,7 @@ class Event:
             #         self.properties['end'] = ""
                     # self.properties['allDay'] = False
             
-               
+                
     def from_notion_page(self, notion_page):# fromnotion_page(self, notion_page):
         self.properties['notionId'] = notion_page['id']
         self.properties['notionCreated'] = notion_page['created_time']
@@ -194,6 +202,10 @@ class Event:
             self.properties['calendar'] = notion_page['properties']['Calendar']['multi_select'][0]['name']
         except:
             self.properties['calendar'] = ""
+        try:
+            self.properties['googleCalendar'] = notion_page['properties']['googleCalendar']['multi_select'][0]['name']
+        except:
+            self.properties['googleCalendar'] = ""
         try:
             self.properties['description'] = notion_page['properties']['Description']['rich_text'][0]['text']['content']
         except:
@@ -229,7 +241,7 @@ class Event:
             self.properties['recurringEventId'] = notion_page['properties']['recurringEventId']['rich_text'][0]['text']['content']
         except:
             self.properties['recurringEventId'] = ""
-        
+"""        
     def toNotionPage(self, NOTION_DATABASE, NOTION_API_KEY=""):
         endDate = self.properties['end']
         if endDate == self.properties['start']:
@@ -433,4 +445,4 @@ class Event:
             return []
         for matchedEvents in [x for x in compareCalendar.allProperties() if ((x['googleId'] == self.properties['googleId']) or (x['recurringEventId'] == self.properties['googleId']))]:
             matchedEventList.append(matchedEvents)
-        return matchedEventList
+        return matchedEventList """
