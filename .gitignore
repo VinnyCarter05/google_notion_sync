@@ -10778,3 +10778,4 @@ google_notion_sync/config/synctoken.json
 google_notion_sync/config/token.json
 google_notion_sync/google_api/__pycache__/calendar.cpython-39.pyc
 google_notion_sync/notion_api/__pycache__/database.cpython-39.pyc
+google_notion_sync/tests/notion_del_events.py
