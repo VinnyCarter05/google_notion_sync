@@ -6,6 +6,8 @@ import datetime
 import pytz
 import logging
 
+import requests
+
 from google_notion_sync.google_api.calendar import get_google_instances
 
 # logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s',filename='./logs/example.log', filemode='w')
@@ -203,7 +205,7 @@ class Event:
         except:
             self.properties['calendar'] = ""
         try:
-            self.properties['googleCalendar'] = notion_page['properties']['googleCalendar']['multi_select'][0]['name']
+            self.properties['googleCalendar'] = notion_page['properties']['googleCalendar']['rich_text'][0]['text']['content']
         except:
             self.properties['googleCalendar'] = ""
         try:
@@ -241,8 +243,104 @@ class Event:
             self.properties['recurringEventId'] = notion_page['properties']['recurringEventId']['rich_text'][0]['text']['content']
         except:
             self.properties['recurringEventId'] = ""
-"""        
-    def toNotionPage(self, NOTION_DATABASE, NOTION_API_KEY=""):
+    
+
+    def notion_payload (self, NOTION_DATABASE):
+        endDate = self.properties['end']
+        if endDate == self.properties['start']:
+            endDate = None
+        payload = {
+        'parent': {'database_id': NOTION_DATABASE},
+        'properties': {'Calendar': 
+                        {'multi_select': 
+                        [
+                            {'name': self.properties['calendar'].replace(',','')[:99]}
+                        ]
+                        },
+                        'googleCalendar': 
+                        {'rich_text': 
+                        [
+                            {'text': 
+                                {'content':self.properties['googleCalendar'][:199]}
+                            }
+                        ]
+                        },
+                        'Description': 
+                        {'rich_text': 
+                        [
+                            {'text': 
+                                {'content':self.properties['description'][:199]}
+                            }
+                        ]
+                        },
+                        'Date': 
+                        {'date': 
+                        {'start':self.properties['start'],
+                            'end':endDate
+                        }
+                        },
+                        'recurrence': 
+                        {'rich_text': 
+                        [
+                            {'text': 
+                                {'content':str(self.properties['recurrence'])}
+                            }
+                        ]
+                        },
+                        'Location': 
+                        {'rich_text': 
+                        [
+                            {'text': 
+                                {'content':self.properties['location']}
+                            }
+                        ]
+                        },
+                        'Summary': 
+                        {'title': 
+                        [
+                            {'text': 
+                                {'content':self.properties['summary']}
+                            }
+                        ]
+                        },
+                        'googleId':
+                        {'rich_text': 
+                        [
+                            {'text': 
+                                {'content':self.properties['googleId']}
+                            }
+                        ]
+                        },
+                        'googleCreated':
+                        {'rich_text': 
+                        [
+                            {'text': 
+                                {'content':self.properties['googleCreated']}
+                            }
+                        ]
+                        },
+                        'googleUpdated':
+                        {'rich_text': 
+                        [
+                            {'text': 
+                                {'content':self.properties['googleUpdated']}
+                            }
+                        ]
+                        },
+                        'recurringEventId':
+                        {'rich_text': 
+                        [
+                            {'text': 
+                                {'content':self.properties['recurringEventId']}
+                            }
+                        ]
+                        }
+                        }
+        }
+        return payload
+
+"""
+    def add_notion_page(self, NOTION_DATABASE, headers):
         endDate = self.properties['end']
         if endDate == self.properties['start']:
             endDate = None
@@ -254,6 +352,14 @@ class Event:
                                 {'name': self.properties['calendar'].replace(',','')[:99]}
                             ]
                            },
+                            'googleCalendar': 
+                            {'rich_text': 
+                            [
+                                {'text': 
+                                    {'content':self.properties['googleCalendar'][:199]}
+                                }
+                            ]
+                            },
                            'Description': 
                            {'rich_text': 
                             [
@@ -326,15 +432,18 @@ class Event:
                            }
                           }
         }
+        # from google_notion_sync.notion_api.database import notion_create_page
+
+        # r = notion_create_page(headers=headers, payload=payload)
         url = 'https://api.notion.com/v1/pages'
         # logger.info (payload)
-        r = requests.post(url, headers=self.headers, json=payload)
+        r = requests.post(url, headers=headers, json=payload)
         # logger.info(r.json())
         self.properties['notionId'] = r.json()['id']
         self.properties['notionCreated'] = r.json()['created_time']
         self.properties['notionUpdated'] = r.json()['last_edited_time']
         return r
-
+        
     def updateNotionPage(self, NOTION_DATABASE):
         if self.properties['notionId'] == "":
             logger.warning ("page doesn't exist.  Creating page instead of updating")

@@ -2,6 +2,7 @@
 
 import asyncio
 from http.client import responses
+import json
 import logging
 from urllib import response
 import aiohttp
@@ -74,3 +75,73 @@ async def async_notion_delete_pages(headers, notion_page_ids):
             if response != None:
                 all_responses.append(response)
         return await asyncio.gather(*all_responses)
+
+def notion_create_page(headers, payload):
+    url = f'https://api.notion.com/v1/pages'
+    try:
+        r = requests.post(url, headers=headers, json=payload)
+        return r
+    except:
+        logger.error (f'unable to create notion page')
+        return None
+
+async def async_notion_create_page(session, headers, payload):
+    url = f'https://api.notion.com/v1/pages'
+    try:
+        logger.info(f"headers = {headers}\npayload = {payload}")
+        response = await session.post(url, headers=headers, json=payload)
+        return response
+    except:
+        logger.error (f'unable to create notion page')
+        return None
+
+async def async_notion_create_pages(NOTION_DATABASE, headers, events):
+    async with aiohttp.ClientSession() as session:
+        all_responses = []
+        for event in events:
+            response = asyncio.ensure_future(async_notion_create_page(session=session,headers = headers, payload=event.notion_payload(NOTION_DATABASE)))
+            all_responses.append(response)
+        r = await asyncio.gather(*all_responses)
+        logger.info (f"r = {r}")
+        for idx, event in enumerate(events):
+            if not r[idx].ok:
+                logger.error (f"http status, reason : {r[idx].status}, {r[idx].reason}")
+                continue
+            content = await r[idx].content.read()
+            content_json = json.loads(content)
+            event.properties['notionId'] = content_json['id']
+            event.properties['notionCreated'] = content_json['created_time']
+            event.properties['notionUpdated'] = content_json['last_edited_time']
+            logger.info (f"event.properties = {event.properties}")
+
+async def async_notion_update_page(session, notion_id, headers, payload):
+    url = f"https://api.notion.com/v1/pages/{notion_id}"
+    try:
+        response = await session.patch(url, headers=headers, json=payload)
+        return response
+    except:
+        logger.error (f'unable to update notion page with notion_id = {notion_id}')
+
+async def async_notion_update_pages(NOTION_DATABASE, headers, events):
+    async with aiohttp.ClientSession() as session:
+        all_responses = []
+        for event in events:
+            if event.properties['notionId'] != "":
+                logger.info(f"notion_update_page with notion_id = {event.properties['notionId']}")
+                response = asyncio.ensure_future(async_notion_update_page(session=session, notion_id = event.properties['notionId'], headers = headers, payload = event.notion_payload(NOTION_DATABASE)))
+            else:
+                logger.warn(f"no notionId so notion_creating_page instead")
+                response = asyncio.ensure_future(async_notion_create_page(session=session,headers = headers, payload=event.notion_payload(NOTION_DATABASE)))
+            all_responses.append(response)
+        r = await asyncio.gather(*all_responses)
+        logger.info(f"r = {r}")
+        for idx, event in enumerate(events):
+            if not r[idx].ok:
+                logger.error (f"http status, reason : {r[idx].status}, {r[idx].reason}")
+                continue
+            content = await r[idx].content.read()
+            content_json = json.loads(content)
+            event.properties['notionId'] = content_json['id']
+            event.properties['notionCreated'] = content_json['created_time']
+            event.properties['notionUpdated'] = content_json['last_edited_time']
+            logger.info (f"event.properties = {event.properties}")

@@ -73,7 +73,7 @@ class Calendar:
         
     def load_from_notion(self):
         self.all_notion_page_ids = self.get_all_notion_event_ids(self.notion_database_id)
-        logger.warning(f"all_notion_page_ids = {self.all_notion_page_ids}")
+        logger.debug(f"all_notion_page_ids = {self.all_notion_page_ids}")
         if self.all_notion_page_ids:
             asyncio.run(self.get_notion_event_list(self.all_notion_page_ids))
             # self.all_events = self.get_notion_event_list (self.all_notion_page_ids)

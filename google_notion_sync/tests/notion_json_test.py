@@ -12,7 +12,7 @@ from google_notion_sync.google_api.credentials import get_google_creds
 from google_notion_sync.google_api.calendar import get_all_google_calendars, get_google_calendar_service 
 from google_notion_sync.google_api.drive import get_google_drive_service
 from google_notion_sync.classes.calendar import Calendar
-from google_notion_sync.notion_api.database import async_notion_delete_pages, notion_delete_page
+from google_notion_sync.notion_api.database import async_notion_create_pages, async_notion_delete_pages, notion_delete_page
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s',filename='./logs/example.log', filemode='w')
 logger = logging.getLogger(__name__)
@@ -39,7 +39,8 @@ def run():
     with open ("./google_notion_sync/data/notion_calendar.pickle","wb") as f:
         pickle.dump(notion_calendar,f)
     print (notion_calendar.all_events[0].properties['notionId'])
-   
+    asyncio.run(async_notion_create_pages(NOTION_DATABASE, headers=headers, events = [notion_calendar.all_events[0]]))
+    # notion_calendar.all_events[0].add_notion_page(NOTION_DATABASE, headers)
     # notion_delete_page(headers=headers, notion_page_id=notion_calendar.all_events[0].properties['notionId'])
     
     # all_google_calendars = get_all_google_calendars(calendar_service)
