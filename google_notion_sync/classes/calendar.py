@@ -15,6 +15,9 @@ from google_notion_sync.utils.helpers import datetime_from_now, event_start_date
 
 # logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s',filename='./logs/example.log', filemode='w')
 logger = logging.getLogger(__name__)
+import platform
+if platform.system()=='Windows':
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 class Calendar:
     # def __init__ (self, notion_database_id="", googleCalendarId="", loadFrom = "notion",resync=True,timeMinDays=1,timeMaxDays=1):
@@ -90,7 +93,7 @@ class Calendar:
             r = notion_query_database(databaseId, headers=self.headers, payload=payload)
             if r != None:
                 if r.status_code >= 400:
-                    logger.error (f"Status code to notion_database_query = {r.status_code}")
+                    logger.error (f"Status code to notion_database_query = {r.status_code}\n response headers = {r.headers}")
                     has_more = False
                 else:
                     logger.info (f"r.json()['has_more'] = {r.json()['has_more']}, r.json()['next_cursor'] = {r.json()['next_cursor']}")

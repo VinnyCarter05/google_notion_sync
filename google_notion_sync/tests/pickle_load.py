@@ -10,19 +10,20 @@ from google_notion_sync.classes.event import Event
 from google_notion_sync.google_api.calendar import get_all_google_calendars, get_google_calendar_service
 from google_notion_sync.google_api.credentials import get_google_creds
 from google_notion_sync.google_api.drive import get_google_drive_service, google_drive_download_file, google_drive_file_upload
+from google_notion_sync.utils.configure import CALENDAR_SERVICE
 from google_notion_sync.utils.helpers import pickle_load
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s',
                     filename='./logs/example.log', filemode='w')
 logger = logging.getLogger(__name__)
 
-SCOPES = ['https://www.googleapis.com/auth/calendar',
-          'https://www.googleapis.com/auth/drive']
-creds = get_google_creds(SCOPES, token_path='./google_notion_sync/config/token.json',
-                         credentials_path='./google_notion_sync/config/credentials.json')
-calendar_service = get_google_calendar_service(creds)
-drive_service = get_google_drive_service(creds)
-all_google_calendars = get_all_google_calendars(calendar_service)
+# SCOPES = ['https://www.googleapis.com/auth/calendar',
+#           'https://www.googleapis.com/auth/drive']
+# creds = get_google_creds(SCOPES, token_path='./google_notion_sync/config/token.json',
+#                          credentials_path='./google_notion_sync/config/credentials.json')
+# calendar_service = get_google_calendar_service(creds)
+# drive_service = get_google_drive_service(creds)
+all_google_calendars = get_all_google_calendars(CALENDAR_SERVICE)
 
 
 with open("./google_notion_sync/data/notion_calendar.pickle", "rb") as f:
