@@ -197,6 +197,10 @@ class Event:
         except:
             self.properties['googleUpdated'] = ""
         try:
+            self.properties['googleStatus'] = notion_page['properties']['googleStatus']['rich_text'][0]['text']['content']
+        except:
+            self.properties['googleStatus'] = ""
+        try:
             self.properties['summary'] = notion_page['properties']['Summary']['title'][0]['text']['content']
         except:
             self.properties['summary'] = ""
@@ -262,6 +266,14 @@ class Event:
                         [
                             {'text': 
                                 {'content':self.properties['googleCalendar'][:199]}
+                            }
+                        ]
+                        },
+                        'googleStatus': 
+                        {'rich_text': 
+                        [
+                            {'text': 
+                                {'content':self.properties['googleStatus'][:199]}
                             }
                         ]
                         },

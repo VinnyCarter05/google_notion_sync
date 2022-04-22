@@ -130,8 +130,9 @@ async def async_notion_update_pages(NOTION_DATABASE, headers, events):
                 logger.info(f"notion_update_page with notion_id = {event.properties['notionId']}")
                 response = asyncio.ensure_future(async_notion_update_page(session=session, notion_id = event.properties['notionId'], headers = headers, payload = event.notion_payload(NOTION_DATABASE)))
             else:
-                logger.warn(f"no notionId so notion_creating_page instead")
+                logger.warn(f"no notionId so notion_creating_page instead with payload = {event.notion_payload(NOTION_DATABASE)}")
                 response = asyncio.ensure_future(async_notion_create_page(session=session,headers = headers, payload=event.notion_payload(NOTION_DATABASE)))
+                # response = asyncio.ensure_future(async_notion_create_page(session=session,headers = headers, payload=event.notion_payload(NOTION_DATABASE)))
             all_responses.append(response)
         r = await asyncio.gather(*all_responses)
         logger.info(f"r = {r}")

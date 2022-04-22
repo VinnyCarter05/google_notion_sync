@@ -21,7 +21,7 @@ if platform.system()=='Windows':
 
 class Calendar:
     # def __init__ (self, notion_database_id="", googleCalendarId="", loadFrom = "notion",resync=True,timeMinDays=1,timeMaxDays=1):
-    def __init__ (self, notion_database_id="", NOTION_API_KEY="", google_events=[], all_google_calendars=[]):
+    def __init__ (self, notion_database_id="", NOTION_API_KEY="", google_events=[], all_google_calendars=[], events = None):
     #(self, notion_database_id="", googleCalendarId="", NOTION_API_KEY = "", calendarService="", driveService="", googleDriveFileId="", loadFrom = "",resync=True,timeMinDays=1,timeMaxDays=1):
         self.NOTION_API_KEY = NOTION_API_KEY
         self.headers = {"Authorization": f"Bearer {self.NOTION_API_KEY}",
@@ -46,10 +46,14 @@ class Calendar:
             return
 
         if google_events != []:
+            logger.info(f"Calendar from google_events: {google_events}")
             self.from_google_calendar_events(google_events)
             # self.add_calendar_property(all_google_calendars=self.all_google_calendars)
             self.sort_events_by_start_date()
             return
+
+        if events:
+            self.all_events = events
 
         # if loadFrom == 'google':
         #     # rawEvents = self.queryGoogleEvents(googleCalendarId['id'],timeMinDays=self.timeMinDays,timeMaxDays=self.timeMaxDays)
@@ -304,7 +308,9 @@ class Calendar:
 
     def add_calendar(self, new_calendar):
         # adds Calendar class new_calendar -- all_events to self
-        current_calendar = Calendar(google_events=self.all_events,all_google_calendars=self.all_google_calendars) 
+        logger.info(f"self.all_events = {self.all_events}")
+        # current_calendar = Calendar(google_events=self.all_events,all_google_calendars=self.all_google_calendars) 
+        current_calendar = Calendar(events = self.all_events)
         current_calendar.sort_events_by_google_id()
         new_calendar.sort_events_by_google_id()
         logger.info(f"current_calendar = {current_calendar}\n")
@@ -326,27 +332,27 @@ class Calendar:
             if cur_end and new_end:
                 break
             if cur_end:
-                if new_event.properties['googleStatus'] == 'confirmed':
+                if new_event.properties['googleStatus'] != 'cancelled':
                     keep_calendar.add_event(new_event)
                 new_counter += 1
                 continue
             if new_end:
-                if cur_event.properties['googleStatus'] == 'confirmed':
+                if cur_event.properties['googleStatus'] != 'cancelled':
                     keep_calendar.add_event(cur_event)
                 cur_counter += 1
                 continue
             if cur_event <= new_event:
-                if new_event.properties['googleStatus'] == 'confirmed':
+                if new_event.properties['googleStatus'] != 'cancelled':
                     keep_calendar.add_event(new_event)
                 cur_counter += 1
                 new_counter += 1
                 continue
             if cur_event < new_event:
-                if cur_event.properties['googleStatus'] == 'confirmed':
+                if cur_event.properties['googleStatus'] != 'cancelled':
                     keep_calendar.add_event(cur_event)
                 cur_counter += 1
             else:
-                if new_event.properties['googleStatus'] == 'confirmed':
+                if new_event.properties['googleStatus'] != 'cancelled':
                     keep_calendar.add_event(new_event)
                 new_counter += 1
         keep_calendar.sort_events_by_google_id()

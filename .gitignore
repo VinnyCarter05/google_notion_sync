@@ -22637,3 +22637,4 @@ google_notion_sync/config/token.json
 google_notion_sync.egg-info/dependency_links.txt
 google_notion_sync.egg-info/SOURCES.txt
 google_notion_sync.egg-info/top_level.txt
+google_notion_sync/config/credentials.json
