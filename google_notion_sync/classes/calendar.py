@@ -328,39 +328,50 @@ class Calendar:
         cur_end = False
         new_end = False
         while True:
+            logger.info(f"cur_counter,new_counter = {cur_counter,new_counter}")
             if cur_counter < len(current_calendar.all_events):
                 cur_event = current_calendar.all_events[cur_counter]
+                logger.info(f"cur_event = {cur_event}")
             else:
                 cur_end = True
             if new_counter < len(new_calendar.all_events):
                 new_event = new_calendar.all_events[new_counter]
+                logger.info(f"new_event = {new_event}")
             else:
                 new_end = True
             if cur_end and new_end:
+                logger.info(f"cur_end and new_end")
                 break
             if cur_end:
                 if new_event.properties['googleStatus'] != 'cancelled':
                     keep_calendar.add_event(new_event)
+                    logger.info(f"cur_end - keep new_event")
                 new_counter += 1
                 continue
             if new_end:
                 if cur_event.properties['googleStatus'] != 'cancelled':
                     keep_calendar.add_event(cur_event)
+                    logger.info(f"new_end - keep cur_event")
                 cur_counter += 1
                 continue
-            if cur_event <= new_event:
+            if cur_event <= new_event: #cur_event is an instance of new_event
                 if new_event.properties['googleStatus'] != 'cancelled':
+                    if not new_event.properties['notionId'] and cur_event.properties['notionId']:
+                        new_event.properties['notionId'] = cur_event.properties['notionId']
                     keep_calendar.add_event(new_event)
+                    logger.info(f"cur_event <= new_event - keep new_event")
                 cur_counter += 1
                 new_counter += 1
                 continue
-            if cur_event < new_event:
+            if cur_event < new_event: #cur_event.properites['googleId']<new_even.properites['googleId']t
                 if cur_event.properties['googleStatus'] != 'cancelled':
                     keep_calendar.add_event(cur_event)
+                    logger.info(f"cur_event < new_event - keep cur_event")
                 cur_counter += 1
             else:
                 if new_event.properties['googleStatus'] != 'cancelled':
                     keep_calendar.add_event(new_event)
+                    logger.info(f"else cur_event not < new_event - keep new_event")
                 new_counter += 1
         keep_calendar.sort_events_by_google_id()
         self.all_events = keep_calendar.all_events

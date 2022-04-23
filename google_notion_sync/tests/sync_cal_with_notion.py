@@ -17,8 +17,8 @@ def run ():
     merged_calendar = deepcopy(notion_calendar)
     merged_calendar.add_calendar(new_calendar=new_calendar)
     print (f"notion_calendar = {notion_calendar}\nmerged_calendar {merged_calendar}")
-    # asyncio.run(async_notion_update_pages(NOTION_DATABASE, headers=HEADERS, events = [event for event in merged_calendar.all_events]))
-    asyncio.run(async_notion_create_pages(NOTION_DATABASE=NOTION_DATABASE, headers=HEADERS, events=new_calendar.all_events))
+    asyncio.run(async_notion_update_pages(NOTION_DATABASE, headers=HEADERS, events = [event for event in merged_calendar.all_events]))
+    # asyncio.run(async_notion_create_pages(NOTION_DATABASE=NOTION_DATABASE, headers=HEADERS, events=new_calendar.all_events))
     # notion_create_page(headers=HEADERS,payload = new_calendar.all_events[0].notion_payload)
     print (f"events ={new_calendar.all_events}")
 

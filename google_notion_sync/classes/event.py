@@ -67,7 +67,7 @@ class Event:
         return (self.properties['googleId'][:26]== __o.properties['googleId'][:26] and len(self.properties['googleId'])>=len(__o.properties['googleId'])) 
 
     def __lt__(self, __o: object) -> bool:
-        # returns true if __o is an instance of self
+        # returns true if self is less than __o 
         return self.properties['googleId']< __o.properties['googleId']
 
     def __le__(self, __o: object) -> bool:
