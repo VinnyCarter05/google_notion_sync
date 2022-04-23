@@ -21,7 +21,7 @@ if platform.system()=='Windows':
 
 class Calendar:
     # def __init__ (self, notion_database_id="", googleCalendarId="", loadFrom = "notion",resync=True,timeMinDays=1,timeMaxDays=1):
-    def __init__ (self, notion_database_id="", NOTION_API_KEY="", google_events=[], all_google_calendars=[], events = None):
+    def __init__ (self, notion_database_id="", NOTION_API_KEY="", google_events=[], all_google_calendars_dict=[], events = None):
     #(self, notion_database_id="", googleCalendarId="", NOTION_API_KEY = "", calendarService="", driveService="", googleDriveFileId="", loadFrom = "",resync=True,timeMinDays=1,timeMaxDays=1):
         self.NOTION_API_KEY = NOTION_API_KEY
         self.headers = {"Authorization": f"Bearer {self.NOTION_API_KEY}",
@@ -37,7 +37,7 @@ class Calendar:
         # self.timeMaxDays=timeMaxDays
         # self.date_min = datetime_from_now(-timeMinDays)
         # self.date_max = datetime_from_now(timeMaxDays)
-        self.all_google_calendars = all_google_calendars
+        self.all_google_calendars_dict = all_google_calendars_dict
         self.all_events = []
 
         # if loadFrom == 'notion':
@@ -298,6 +298,13 @@ class Calendar:
     def from_google_calendar_events (self, google_calendar_events):
         for event in google_calendar_events:  # google_instances:
             ev = Event(google_event=event)
+            if ev.properties['calendar'] == "":
+                logger.info (f"ev has no calendar googleCalendar is {ev.properties['googleCalendar']}")
+                try:
+                    ev_calendar = self.all_google_calendars_dict[ev.properties['googleCalendar']]
+                    ev.properties['calendar'] = ev_calendar
+                except:
+                    logger.error (f"Invalid calendar from googleCalendar = {ev.properties['googleCalendar']}")
             self.all_events.append(ev)
 
     def any_canceled(self)-> bool:

@@ -4,7 +4,7 @@ import pickle
 from google_notion_sync.classes.calendar import Calendar
 from google_notion_sync.notion_api.database import async_notion_create_pages, async_notion_update_pages, notion_create_page
 
-from google_notion_sync.utils.configure import ALL_GOOGLE_CALENDARS, HEADERS, NOTION_API_KEY, NOTION_DATABASE
+from google_notion_sync.utils.configure import ALL_GOOGLE_CALENDARS_DICT, HEADERS, NOTION_API_KEY, NOTION_DATABASE
 
 
 def run ():
@@ -12,7 +12,7 @@ def run ():
     print (notion_calendar)
     with open("google_notion_sync/data/5changesingleevent.pickle", "rb") as f:
         google_trial_events_5 = pickle.load(f)
-    new_calendar = Calendar(google_events=google_trial_events_5, all_google_calendars=ALL_GOOGLE_CALENDARS)
+    new_calendar = Calendar(google_events=google_trial_events_5, all_google_calendars_dict=ALL_GOOGLE_CALENDARS_DICT)
     print (new_calendar)
     merged_calendar = deepcopy(notion_calendar)
     merged_calendar.add_calendar(new_calendar=new_calendar)
@@ -20,6 +20,7 @@ def run ():
     # asyncio.run(async_notion_update_pages(NOTION_DATABASE, headers=HEADERS, events = [event for event in merged_calendar.all_events]))
     asyncio.run(async_notion_create_pages(NOTION_DATABASE=NOTION_DATABASE, headers=HEADERS, events=new_calendar.all_events))
     # notion_create_page(headers=HEADERS,payload = new_calendar.all_events[0].notion_payload)
+    print (f"events ={new_calendar.all_events}")
 
 
 
