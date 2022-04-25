@@ -22638,3 +22638,5 @@ google_notion_sync.egg-info/dependency_links.txt
 google_notion_sync.egg-info/SOURCES.txt
 google_notion_sync.egg-info/top_level.txt
 google_notion_sync/config/credentials.json
+google_notion_sync/data/all_google_events.pickle
+google_notion_sync/data/google_calendar.pickle

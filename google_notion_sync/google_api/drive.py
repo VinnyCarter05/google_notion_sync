@@ -34,6 +34,8 @@ def google_drive_file_upload (service, upload_file, drive_file_name, folder, mim
 
 def google_drive_replace_file(service, file_name, fileId, mimetype):
     logger.info ("Uploading file " + file_name + "...")
+
+    logger.warn(f"fileId = {fileId}")
     media = MediaFileUpload(file_name, mimetype = mimetype)
     return service.files().update(fileId=fileId, media_body=media).execute()
 

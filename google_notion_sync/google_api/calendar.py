@@ -89,7 +89,7 @@ def google_calendar_sync_events_list(service, drive_service, google_drive_fileId
         timeMax = None
     all_events = []
     #     // Load the sync token stored from the last execution, if any.
-    logger.warning("google_calendar_sync_events_list")
+    logger.info("google_calendar_sync_events_list")
     sync_token = None
     sync_tokens = {}
     st_file_name = './google_notion_sync/config/synctoken.json'
@@ -152,9 +152,9 @@ def google_calendar_sync_events_list(service, drive_service, google_drive_fileId
             last_page=True
         else:
             for event in items:
-                logger.warning(f"event = {event}")
+                logger.info(f"event = {event}")
                 event['calendar'] = calendar_id
-                logger.warning(f"new event = {event}")
+                logger.info(f"new event = {event}")
                 all_events.append(event)
             if 'nextPageToken' in events.keys():
                 page_token = events['nextPageToken']

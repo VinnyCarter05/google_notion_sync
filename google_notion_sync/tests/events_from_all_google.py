@@ -12,7 +12,7 @@ from google_notion_sync.google_api.calendar import get_all_google_calendars, get
 from google_notion_sync.google_api.drive import get_google_drive_service, google_drive_file_upload, google_drive_replace_file
 from google_notion_sync.classes.calendar import Calendar
 from google_notion_sync.classes.event import Event
-from google_notion_sync.utils.configure import ALL_GOOGLE_CALENDARS, DRIVE_SERVICE, GOOGLE_DRIVE_GOOGLE_CALENDAR_FILE_ID
+from google_notion_sync.utils.configure import ALL_GOOGLE_CALENDARS, ALL_GOOGLE_CALENDARS_DICT, DRIVE_SERVICE, GOOGLE_DRIVE_GOOGLE_CALENDAR_FILE_ID
 from google_notion_sync.utils.helpers import as_list, pickle_load, pickle_save
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s',filename='./logs/example.log', filemode='w')
@@ -34,13 +34,13 @@ def run():
     # all_google_calendars = get_all_google_calendars(calendar_service)
     logger.info(ALL_GOOGLE_CALENDARS)
     all_google_events = []
-    google_calendar = Calendar(google_events=all_google_calendar_events, all_google_calendars=ALL_GOOGLE_CALENDARS)
+    google_calendar = Calendar(google_events=all_google_calendar_events, all_google_calendars_dict=ALL_GOOGLE_CALENDARS_DICT)
     # google_calendar.from_google_calendar_events(all_google_calendar_events)
     # google_calendar.sort_events_by_start_date()
     print (google_calendar)
     pickle_file_path = "./google_notion_sync/data/google_calendar.pickle"
     pickle_save(google_calendar,pickle_file_path)
-    google_drive_replace_file(DRIVE_SERVICE,pickle_file_path, GOOGLE_DRIVE_GOOGLE_CALENDAR_FILE_ID,"application/octet-stream")
+    google_drive_replace_file(service=DRIVE_SERVICE, file_name=pickle_file_path, fileId=GOOGLE_DRIVE_GOOGLE_CALENDAR_FILE_ID,mimetype="application/octet-stream")
     
     # for event in all_google_calendar_events:  # google_instances:
     #     ev = Event(google_event=event)
