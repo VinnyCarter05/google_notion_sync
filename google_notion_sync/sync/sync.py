@@ -53,7 +53,7 @@ if __name__ == "__main__":
     notion_calendar = Calendar()
     while True:
         try:
-            print("1. resync all google calendar events\n2. download new google calendar events\n3. upload calendar to google drive\n4. download calendar from google drive\n")
+            print("1. resync all google calendar events\n2. download new google calendar events\n3. upload calendar to google drive\n4. download calendar from google drive")
             print("5. print calendar\n6. download all notion events")
             choice = int(input("10. exit\n"))
         except ValueError:
