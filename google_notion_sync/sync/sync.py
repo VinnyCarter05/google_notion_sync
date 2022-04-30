@@ -1,7 +1,7 @@
 import asyncio
 from copy import deepcopy
 import logging
-from nis import match
+from tokenize import Name
 from google_notion_sync.classes.calendar import Calendar
 from google_notion_sync.google_api.calendar import get_all_google_calendars, google_calendar_sync_events_list
 from google_notion_sync.google_api.drive import google_drive_replace_file
@@ -49,10 +49,12 @@ def calendar_save_to_google_drive(calendar):
 
 
 if __name__ == "__main__":
+    calendar_db = Calendar()
+    notion_calendar = Calendar()
     while True:
         try:
             print("1. resync all google calendar events\n2. download new google calendar events\n3. upload calendar to google drive\n4. download calendar from google drive\n")
-            print("5. print calendar")
+            print("5. print calendar\n6. download all notion events")
             choice = int(input("10. exit\n"))
         except ValueError:
             print ("\nInteger value please. 5 to exit\n")
@@ -65,7 +67,12 @@ if __name__ == "__main__":
             case 3:
                 calendar_save_to_google_drive(calendar_db)
             case 5:
-                print (f"{calendar_db}")
+                print (f"calendar_db = {calendar_db}")
+                print (f"notion_calendar = {notion_calendar}")
+            case 6:
+                notion_calendar = Calendar(notion_database_id=NOTION_DATABASE, NOTION_API_KEY=NOTION_API_KEY)
+            case 10:
+                break
             case _:
                 print (choice)
             
