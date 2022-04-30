@@ -33120,3 +33120,4 @@ google_notion_sync/utils/__pycache__/__init__.cpython-39.pyc
 google_notion_sync/utils/__pycache__/configure.cpython-39.pyc
 google_notion_sync/utils/__pycache__/helpers.cpython-39.pyc
 google_notion_sync.egg-info/PKG-INFO
+google_notion_sync/data/current_calendar.pickle
