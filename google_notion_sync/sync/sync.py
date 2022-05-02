@@ -54,31 +54,55 @@ def calendar_load_from_google_drive():
     
 
 if __name__ == "__main__":
-    calendar_db = Calendar()
+    new_calendar = Calendar()
+    current_calendar = Calendar()
     notion_calendar = Calendar()
     while True:
         try:
-            print("1. resync all google calendar events\n2. download new google calendar events\n3. upload calendar to google drive\n4. download calendar from google drive")
-            print("5. print calendar\n6. download all notion events")
-            choice = int(input("10. exit\n"))
+            print("1. resync all google calendar events to new events")
+            print("2. download new google calendar events to new events")
+            print("3. upload current calendar to google drive")
+            print("4. download calendar from google drive to current calendar")
+            print("5. print calendars")
+            print("6. download all notion events to notion calendar")
+            print("7. merge new events to notion calendar")
+            print("8. merge new events to current calendar")
+            print("9. merge notion calendar to current calendar")
+            print("10. clear new events")
+            print("11. clear current calendar")
+            print("12. clear notion calendar")
+            choice = int(input("99. exit\n"))
         except ValueError:
             print ("\nInteger value please. 5 to exit\n")
             continue
         match choice:
             case 1:
-                calendar_db = Calendar(google_events=get_all_google_events(), all_google_calendars_dict=ALL_GOOGLE_CALENDARS_DICT)
+                new_calendar = Calendar(google_events=get_all_google_events(), all_google_calendars_dict=ALL_GOOGLE_CALENDARS_DICT)
             case 2:
-                calendar_db = Calendar(google_events=get_all_new_google_events(),all_google_calendars_dict=ALL_GOOGLE_CALENDARS_DICT)
+                new_calendar = Calendar(google_events=get_all_new_google_events(),all_google_calendars_dict=ALL_GOOGLE_CALENDARS_DICT)
             case 3:
-                calendar_save_to_google_drive(calendar_db)
+                calendar_save_to_google_drive(current_calendar)
             case 4:
-                calendar_db = calendar_load_from_google_drive()
+                current_calendar = calendar_load_from_google_drive()
             case 5:
-                print (f"calendar_db = {calendar_db}")
+                print (f"new_calendar = {new_calendar}")
+                print (f"current_calendar = {current_calendar}")
                 print (f"notion_calendar = {notion_calendar}")
             case 6:
                 notion_calendar = Calendar(notion_database_id=NOTION_DATABASE, NOTION_API_KEY=NOTION_API_KEY)
+            case 7:
+                notion_calendar.add_calendar(new_calendar=new_calendar)
+            case 8:
+                current_calendar.add_calendar(new_calendar=new_calendar)
+            case 9:
+                current_calendar.add_calendar(new_calendar=notion_calendar)
             case 10:
+                new_calendar = Calendar()
+            case 11:
+                current_calendar = Calendar()
+            case 12:
+                notion_calendar = Calendar()
+            case 99:
                 break
             case _:
                 print (choice)

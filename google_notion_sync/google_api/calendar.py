@@ -92,7 +92,7 @@ def google_calendar_sync_events_list(service, drive_service, google_drive_fileId
     logger.info("google_calendar_sync_events_list")
     sync_token = None
     sync_tokens = {}
-    st_file_name = './google_notion_sync/config/synctoken.json'
+    st_file_name = 'google_notion_sync/config/synctoken.json'
     GOOGLE_DRIVE_FOLDER_ID = os.getenv('GOOGLE_DRIVE_FOLDER_ID')
     if drive_service!="" and google_drive_fileId!="":
         try:
@@ -141,7 +141,7 @@ def google_calendar_sync_events_list(service, drive_service, google_drive_fileId
             fiahl = drive_service.files().create(body=body, media_body=media).execute()
             os.remove(st_file_name) #? need to remove
             sync_token = None
-            all_events = google_calendar_sync_events_list(service,drive_service, google_drive_fileId=google_drive_fileId, calendarId=calendar_id,resync=resync,timeMinDays=timeMinDays,timeMaxDays=timeMaxDays)
+            all_events = google_calendar_sync_events_list(service,drive_service, google_drive_fileId=google_drive_fileId, calendar_id=calendar_id,resync=resync,timeMinDays=timeMinDays,timeMaxDays=timeMaxDays)
             return all_events
         elif error_ > 0:
             logger.error ('error:', error_)
