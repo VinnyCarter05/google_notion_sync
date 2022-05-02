@@ -376,16 +376,18 @@ class Calendar:
         keep_calendar.sort_events_by_google_id()
         self.all_events = keep_calendar.all_events
 
-    def notion_delete_calendar (self, days_from_now = 36500):
+    def notion_delete_calendar (self, start_days_from_now=36500, end_days_from_now=-36500):
+        # delete notion_calendar between date start_days_from_now and end_days_from_now
         del_events_notion_page_ids = []
+        logger.info(f"notion_delete_calendar ({start_days_from_now, end_days_from_now}")
         for event in self.all_events:
             event_start_dt = event_start_datetime(event=event)
-            after_dt = datetime_from_now(days_from_now)
-            print (f"{event} {event_start_dt} {after_dt}")
-            if event_start_dt > after_dt:
+            start_dt = datetime_from_now(start_days_from_now)
+            end_dt = datetime_from_now(end_days_from_now)
+            logger.warn (f"(start_dt, end_dt) = {start_dt, end_dt}")
+            if event_start_dt > start_dt and event_start_dt < end_dt:
                 del_events_notion_page_ids.append(event.properties['notionId'])
-        print (f"del_events_notion_page_ids = {del_events_notion_page_ids}")
-
         asyncio.run(async_notion_delete_pages(headers=self.headers, notion_page_ids=del_events_notion_page_ids))
         for notion_id in del_events_notion_page_ids:
+            logger.info(f"deleting notion page with notion_id={notion_id}")
             self.delete_event(notion_id=notion_id)

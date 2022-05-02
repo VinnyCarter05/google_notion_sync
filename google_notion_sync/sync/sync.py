@@ -57,6 +57,7 @@ if __name__ == "__main__":
     new_calendar = Calendar()
     current_calendar = Calendar()
     notion_calendar = Calendar()
+    start_days_from_now, end_days_from_now = -36500, 36500
     start_date = datetime_from_now(-36500)
     end_date = datetime_from_now(36500)
     while True:
@@ -74,6 +75,7 @@ if __name__ == "__main__":
             print("11. clear current calendar")
             print("12. clear notion calendar")
             print("13. clear online Notion page between dates")
+            print("20. delete notion calendar between dates")
             print("30. set start date by number")
             print("31. set end date by number")
             choice = int(input("99. exit\n"))
@@ -83,12 +85,15 @@ if __name__ == "__main__":
         match choice:
             case 1:
                 new_calendar = Calendar(google_events=get_all_google_events(), all_google_calendars_dict=ALL_GOOGLE_CALENDARS_DICT)
+                new_calendar.sort_events_by_start_date()
             case 2:
                 new_calendar = Calendar(google_events=get_all_new_google_events(),all_google_calendars_dict=ALL_GOOGLE_CALENDARS_DICT)
+                new_calendar.sort_events_by_start_date()
             case 3:
                 calendar_save_to_google_drive(current_calendar)
             case 4:
                 current_calendar = calendar_load_from_google_drive()
+                current_calendar.sort_events_by_start_date()
             case 5:
                 print (f"start_date = {start_date}")
                 print (f"end_date = {end_date}")
@@ -97,23 +102,33 @@ if __name__ == "__main__":
                 print (f"notion_calendar = {notion_calendar}")
             case 6:
                 notion_calendar = Calendar(notion_database_id=NOTION_DATABASE, NOTION_API_KEY=NOTION_API_KEY)
+                notion_calendar.sort_events_by_start_date()
             case 7:
                 notion_calendar.add_calendar(new_calendar=new_calendar)
+                notion_calendar.sort_events_by_start_date()
             case 8:
                 current_calendar.add_calendar(new_calendar=new_calendar)
+                current_calendar.sort_events_by_start_date()
             case 9:
                 current_calendar.add_calendar(new_calendar=notion_calendar)
+                current_calendar.sort_events_by_start_date()
             case 10:
                 new_calendar = Calendar()
             case 11:
                 current_calendar = Calendar()
             case 12:
                 notion_calendar = Calendar()
+            case 20:
+                if input(f"delete notion_calendar from {start_date} to {end_date}? (y/N)")=="y":
+                    notion_calendar.notion_delete_calendar(start_days_from_now=start_days_from_now, end_days_from_now=end_days_from_now)
+                    notion_calendar = Calendar(notion_database_id=NOTION_DATABASE, NOTION_API_KEY=NOTION_API_KEY)
+                    notion_calendar.sort_events_by_start_date()
             case 30:
                 if input(f"change start_date from {start_date}? (y/N) ") == "y":
                     try:
                         days_from_now = int(input ("days from now (pos integer number of days for future date, neg integer for past date  "))
                         start_date = datetime_from_now(days_from_now)
+                        start_days_from_now = days_from_now
                         print (f"start_date = {start_date}")
                     except ValueError:
                         print ("needs to be an integer")
@@ -122,6 +137,7 @@ if __name__ == "__main__":
                     try:
                         days_from_now = int(input ("days from now (pos integer number of days for future date, neg integer for past date  "))
                         end_date = datetime_from_now(days_from_now)
+                        end_days_from_now = days_from_now
                         print (f"end_date = {end_date}")
                     except ValueError:
                         print ("needs to be an integer")
