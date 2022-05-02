@@ -9,7 +9,7 @@ from google_notion_sync.google_api.drive import google_drive_download_file, goog
 from google_notion_sync.notion_api.database import async_notion_update_pages
 
 from google_notion_sync.utils.configure import ALL_GOOGLE_CALENDARS, ALL_GOOGLE_CALENDARS_DICT, CALENDAR_SERVICE, DRIVE_SERVICE, GOOGLE_DRIVE_FILE_ID, GOOGLE_DRIVE_GOOGLE_CALENDAR_FILE_ID, HEADERS, NOTION_API_KEY, NOTION_DATABASE
-from google_notion_sync.utils.helpers import as_list, pickle_load, pickle_save
+from google_notion_sync.utils.helpers import as_list, datetime_from_now, pickle_load, pickle_save
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +57,8 @@ if __name__ == "__main__":
     new_calendar = Calendar()
     current_calendar = Calendar()
     notion_calendar = Calendar()
+    start_date = datetime_from_now(-36500)
+    end_date = datetime_from_now(36500)
     while True:
         try:
             print("1. resync all google calendar events to new events")
@@ -71,9 +73,12 @@ if __name__ == "__main__":
             print("10. clear new events")
             print("11. clear current calendar")
             print("12. clear notion calendar")
+            print("13. clear online Notion page between dates")
+            print("30. set start date by number")
+            print("31. set end date by number")
             choice = int(input("99. exit\n"))
         except ValueError:
-            print ("\nInteger value please. 5 to exit\n")
+            print ("\nInteger value please. 99 to exit\n")
             continue
         match choice:
             case 1:
@@ -85,6 +90,8 @@ if __name__ == "__main__":
             case 4:
                 current_calendar = calendar_load_from_google_drive()
             case 5:
+                print (f"start_date = {start_date}")
+                print (f"end_date = {end_date}")
                 print (f"new_calendar = {new_calendar}")
                 print (f"current_calendar = {current_calendar}")
                 print (f"notion_calendar = {notion_calendar}")
@@ -102,8 +109,24 @@ if __name__ == "__main__":
                 current_calendar = Calendar()
             case 12:
                 notion_calendar = Calendar()
+            case 30:
+                if input(f"change start_date from {start_date}? (y/N) ") == "y":
+                    try:
+                        days_from_now = int(input ("days from now (pos integer number of days for future date, neg integer for past date  "))
+                        start_date = datetime_from_now(days_from_now)
+                        print (f"start_date = {start_date}")
+                    except ValueError:
+                        print ("needs to be an integer")
+            case 31:
+                if input(f"change end_date from {end_date}? (y/N) ") == "y":
+                    try:
+                        days_from_now = int(input ("days from now (pos integer number of days for future date, neg integer for past date  "))
+                        end_date = datetime_from_now(days_from_now)
+                        print (f"end_date = {end_date}")
+                    except ValueError:
+                        print ("needs to be an integer")
             case 99:
                 break
             case _:
-                print (choice)
+                print (f"{choice} is not a valid input")
             
