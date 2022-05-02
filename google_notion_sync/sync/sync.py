@@ -9,7 +9,7 @@ from google_notion_sync.google_api.drive import google_drive_download_file, goog
 from google_notion_sync.notion_api.database import async_notion_update_pages
 
 from google_notion_sync.utils.configure import ALL_GOOGLE_CALENDARS, ALL_GOOGLE_CALENDARS_DICT, CALENDAR_SERVICE, DRIVE_SERVICE, GOOGLE_DRIVE_FILE_ID, GOOGLE_DRIVE_GOOGLE_CALENDAR_FILE_ID, HEADERS, NOTION_API_KEY, NOTION_DATABASE
-from google_notion_sync.utils.helpers import as_list, datetime_from_now, pickle_load, pickle_save
+from google_notion_sync.utils.helpers import as_list, datetime_from_now, event_start_datetime, pickle_load, pickle_save
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +21,11 @@ def update_notion_database (new_google_events):
     merged_calendar = deepcopy(notion_calendar)
     merged_calendar.add_calendar(new_calendar=new_calendar)
     asyncio.run(async_notion_update_pages(NOTION_DATABASE, headers=HEADERS, events = [event for event in merged_calendar.all_events]))
+
+def notion_update_pages(NOTION_DATABASE, new_calendar, start_days_from_now=36500, end_days_from_now=-36500):
+    events = [event for event in new_calendar.all_events if (datetime_from_now(start_days_from_now) < event_start_datetime(event=event) and datetime_from_now(end_days_from_now) > event_start_datetime(event))]
+    logger.info (f"events to upload = {events}")
+    asyncio.run(async_notion_update_pages(NOTION_DATABASE=NOTION_DATABASE, headers=HEADERS, events=events))
 
 def get_all_google_events():
     all_google_events = []
@@ -76,6 +81,7 @@ if __name__ == "__main__":
             print("12. clear notion calendar")
             print("13. clear online Notion page between dates")
             print("20. delete notion calendar between dates")
+            print("21. upload current calendar to notion between dates")
             print("30. set start date by number")
             print("31. set end date by number")
             choice = int(input("99. exit\n"))
@@ -123,6 +129,9 @@ if __name__ == "__main__":
                     notion_calendar.notion_delete_calendar(start_days_from_now=start_days_from_now, end_days_from_now=end_days_from_now)
                     notion_calendar = Calendar(notion_database_id=NOTION_DATABASE, NOTION_API_KEY=NOTION_API_KEY)
                     notion_calendar.sort_events_by_start_date()
+            case 21:
+                if input(f"Upload current_calendar to Notion from {start_date} to {end_date}? (y/N)")=="y":
+                    notion_update_pages(NOTION_DATABASE, new_calendar=current_calendar, start_days_from_now=start_days_from_now, end_days_from_now=end_days_from_now)
             case 30:
                 if input(f"change start_date from {start_date}? (y/N) ") == "y":
                     try:
