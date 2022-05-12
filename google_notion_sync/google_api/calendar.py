@@ -7,6 +7,7 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload #, MediaIoBaseDownload
 
 from google_notion_sync.google_api.drive import google_drive_download_file, google_drive_replace_file
+# from google_notion_sync.utils.configure import DRIVE_SERVICE 
 from google_notion_sync.utils.helpers import datetime_from_now
 
 # logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(levelname)s:%(message)s',filename='./logs/example.log', filemode='w')
@@ -125,21 +126,25 @@ def google_calendar_sync_events_list(service, drive_service, google_drive_fileId
     #           // A 410 status code, "Gone", indicates that the sync token is invalid.
         if error_ == 410:
             logger.warning ("Invalid sync token, clearing event store and re-syncing")
+            logger.error(f"sync_tokens before pop = {sync_tokens}")
             sync_tokens.pop(calendar_id)
+            logger.error(f"sync_tokens after pop = {sync_tokens}")
             with open(st_file_name,"w") as f:
                 json.dump(sync_tokens,f)
             logger.info ("Uploading file " + st_file_name + "...")
 
-            #We have to make a request hash to tell the google API what we're giving it
-            body = {'name': st_file_name, 'parents': [GOOGLE_DRIVE_FOLDER_ID], 'mimeType': 'application/vnd.google-apps.file'}
+            fiahl = google_drive_replace_file(drive_service,st_file_name,google_drive_fileId,'application/json')
+            # #We have to make a request hash to tell the google API what we're giving it
+            # body = {'name': 'synctoken.json', 'parents': [GOOGLE_DRIVE_FILE_ID], 'mimeType': 'application/vnd.google-apps.file'}
 
-            #Now create the media file upload object and tell it what file to upload,
-            #in this case 'test.html'
-            media = MediaFileUpload('synctoken.json', mimetype = 'text/plain')
+            # #Now create the media file upload object and tell it what file to upload,
+            # #in this case 'test.html'
+            # media = MediaFileUpload(st_file_name, mimetype = 'text/plain')
 
-            #Now we're doing the actual post, creating a new file of the uploaded type
-            fiahl = drive_service.files().create(body=body, media_body=media).execute()
-            os.remove(st_file_name) #? need to remove
+            # #Now we're doing the actual post, creating a new file of the uploaded type
+            # fiahl = drive_service.files().create(body=body, media_body=media).execute()
+
+            # os.remove(st_file_name) #? need to remove
             sync_token = None
             all_events = google_calendar_sync_events_list(service,drive_service, google_drive_fileId=google_drive_fileId, calendar_id=calendar_id,resync=resync,timeMinDays=timeMinDays,timeMaxDays=timeMaxDays)
             return all_events
