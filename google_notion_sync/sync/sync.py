@@ -67,6 +67,7 @@ if __name__ == "__main__":
     end_date = datetime_from_now(36500)
     while True:
         try:
+            print("0. do resync from google calendar from today for 365 days")
             print("1. resync all google calendar events to new events")
             print("2. download new google calendar events to new events")
             print("3. upload current calendar to google drive")
@@ -88,6 +89,39 @@ if __name__ == "__main__":
             print ("\nInteger value please. 99 to exit\n")
             continue
         match choice:
+            case 0:
+                #1
+                print("loading google calendars")
+                new_calendar = Calendar(google_events=get_all_google_events(), all_google_calendars_dict=ALL_GOOGLE_CALENDARS_DICT)
+                new_calendar.sort_events_by_start_date()
+                #6
+                print("loading notion calendar")
+                notion_calendar = Calendar(notion_database_id=NOTION_DATABASE, NOTION_API_KEY=NOTION_API_KEY)
+                notion_calendar.sort_events_by_start_date()
+                #8
+                current_calendar.add_calendar(new_calendar=new_calendar)
+                current_calendar.sort_events_by_start_date()
+                #3
+                print("uploading google calendar")
+                calendar_save_to_google_drive(current_calendar)
+                #30
+                days_from_now = 0
+                start_date = datetime_from_now(days_from_now)
+                start_days_from_now = days_from_now
+                #31
+                days_from_now = 365
+                end_date = datetime_from_now(days_from_now)
+                end_days_from_now = days_from_now
+                #20
+                print("deleting notion calendar for next year")
+                notion_calendar.notion_delete_calendar(start_days_from_now=start_days_from_now, end_days_from_now=end_days_from_now)
+                notion_calendar = Calendar(notion_database_id=NOTION_DATABASE, NOTION_API_KEY=NOTION_API_KEY)
+                notion_calendar.sort_events_by_start_date()
+                #21
+                print("uploading to notion calendar for next year")
+                notion_update_pages(NOTION_DATABASE, new_calendar=current_calendar, start_days_from_now=start_days_from_now, end_days_from_now=end_days_from_now)
+                #99
+                break
             case 1:
                 new_calendar = Calendar(google_events=get_all_google_events(), all_google_calendars_dict=ALL_GOOGLE_CALENDARS_DICT)
                 new_calendar.sort_events_by_start_date()

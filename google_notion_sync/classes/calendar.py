@@ -98,6 +98,7 @@ class Calendar:
             if r != None:
                 if r.status_code >= 400:
                     logger.error (f"Status code to notion_database_query = {r.status_code}\n response headers = {r.headers}")
+                    print(f"Status code to notion_database_query = {r.status_code}\n response headers = {r.headers}")
                     has_more = False
                 else:
                     logger.info (f"r.json()['has_more'] = {r.json()['has_more']}, r.json()['next_cursor'] = {r.json()['next_cursor']}")
