@@ -70,7 +70,7 @@ async def async_notion_delete_pages(headers, notion_page_ids):
     async with aiohttp.ClientSession() as session:
         all_responses = []
         for notion_page_id in notion_page_ids:
-            print (notion_page_id)
+            logger.info (f"notion page to delete: {notion_page_id}")
             response = asyncio.ensure_future(async_notion_delete_page(session=session,headers=headers,notion_page_id=notion_page_id))
             if response != None:
                 all_responses.append(response)
